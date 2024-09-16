@@ -1,132 +1,65 @@
-class ItemPedido {
-    String descricao;
-    int quantidade;
-    double precoUnitario;
-    ItemPedido prox;
+import java.util.Scanner;
 
-    public ItemPedido(String descricao, int quantidade, double precoUnitario) {
-        this.descricao = descricao;
-        this.quantidade = quantidade;
-        this.precoUnitario = precoUnitario;
+class Paciente {
+    String nome;
+    int idade;
+    String hMedico;
+    int cpf; 
+    String ultConsulta;
+    Paciente prox;
+    Paciente ant;
+
+    public Paciente(String nome, int idade, String hMedico, String ultConsulta) {
+        this.nome = nome;
+        this.idade = idade;
+        this.hMedico = hMedico;
+        this.cpf = cpf;
+        this.ultConsulta = ultConsulta;
         this.prox = null;
+        this.ant = null;
     }
 }
-class Pedido {
-    int id;
-    String cliente;
-    ItemPedido inicioItens;
-    double total;
-    Pedido prox;
-    public Pedido(int id, String cliente) {
-        this.id = id;
-        this.cliente = cliente;
-        this.inicioItens = null;
-        this.total = 0.0;
-        this.prox = null;
-    }
-    // Adiciona um item ao pedido e atualiza o total
-    public void adicionarItem(String descricao, int quantidade, double precoUnitario) {
-        ItemPedido novoItem = new ItemPedido(descricao, quantidade, precoUnitario);
-        if (inicioItens == null) {
-            inicioItens = novoItem;
-        } else {
-            ItemPedido atual = inicioItens;
-            while (atual.prox != null) {
-                atual = atual.prox;
-            }
-            atual.prox = novoItem;
-        }
-        total += quantidade * precoUnitario;
-    }
-    // Atualiza o preço total
-    public void atualizarTotal() {
-        total = 0.0;
-        ItemPedido atual = inicioItens;
-        while (atual != null) {
-            total += atual.quantidade * atual.precoUnitario;
-            atual = atual.prox;
-        }
-    }
-}
-// Classe para mesas
-class Mesa {
-    int numero;
-    String clienteAssociado;
-    boolean ocupada;
-    Pedido inicioPedidos;
-    Mesa prox;
-    public Mesa(int numero, String clienteAssociado, boolean ocupada) {
-        this.numero = numero;
-        this.clienteAssociado = clienteAssociado;
-        this.ocupada = ocupada;
-        this.inicioPedidos = null;
-        this.prox = null;
-    }
-    // Adiciona um pedido à mesa
-    public void adicionarPedido(Pedido novoPedido) {
-        if (inicioPedidos == null) {
-            inicioPedidos = novoPedido;
-        } else {
-            Pedido atual = inicioPedidos;
-            while (atual.prox != null) {
-                atual = atual.prox;
-            }
-            atual.prox = novoPedido;
-        }
-    }
-    // Fecha todos os pedidos da mesa e limpa o cliente associado
-    public void fecharConta() {
-        Pedido atual = inicioPedidos;
-        while (atual != null) {
-            System.out.println("Pedido ID: " + atual.id);
-            System.out.println("Cliente: " + atual.cliente);
-            System.out.println("Total: R$ " + atual.total);
-            atual = atual.prox;
-        }
-        clienteAssociado = null;
-        ocupada = false;
-        inicioPedidos = null;
-    }
-}
-// Classe para gerenciar as mesas
-class ListaMesas {
-    private Mesa inicio;
-    public ListaMesas() {
+
+class ListaPacientes {
+    private Paciente inicio;
+
+    public ListaPacientes() {
         this.inicio = null;
     }
-    // Adiciona uma nova mesa
-    public void adicionarMesa(int numero, String clienteAssociado, boolean ocupada) {
-        Mesa novaMesa = new Mesa(numero, clienteAssociado, ocupada);
-        if (inicio == null) {
-            inicio = novaMesa;
-        } else {
-            Mesa atual = inicio;
-            while (atual.prox != null) {
-                atual = atual.prox;
-            }
-            atual.prox = novaMesa;
-        }
+
+    // Método para criar um novo paciente
+    public Paciente criarPaciente() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Digite o nome do paciente:");
+        String nome = scanner.nextLine();
+
+        System.out.println("Digite a idade do paciente:");
+        int idade = scanner.nextInt();
+        scanner.nextLine(); // Limpar o buffer do teclado
+
+        System.out.println("Histórico médico do paciente:");
+        String hMedico = scanner.nextLine();
+
+        System.out.println("Última consulta do paciente (formato DD/MM/AAAA):");
+        String ultConsulta = scanner.nextLine();
+
+        return new Paciente(nome, idade, hMedico, ultConsulta);
     }
-    // Busca uma mesa pelo número
-    public Mesa buscarMesa(int numero) {
-        Mesa atual = inicio;
-        while (atual != null) {
-            if (atual.numero == numero) {
-                return atual;
-            }
+
+    // Método para inserir paciente ordenado alfabeticamente (lista circular)
+    public boolean inserirPacienteOrdenado(Paciente novo) {
+        if (inicio == null) { // Se a lista estiver vazia
+            inicio = novo;
+            inicio.prox = inicio;  // O único nó aponta para si mesmo
+            inicio.ant = inicio;
+            return true;
+        }
+
+        Paciente atual = inicio;
+        Paciente anterior = null;
+
+        do {
+            anterior = atual;
             atual = atual.prox;
-        }
-        return null;
-    }
-    // Imprime a lista de mesas
-    public void imprimirMesas() {
-        Mesa atual = inicio;
-        while (atual != null) {
-            System.out.println("Mesa: " + atual.numero);
-            System.out.println("Cliente Associado: " + (atual.clienteAssociado != null ? atual.clienteAssociado : "Nenhum"));
-            System.out.println("Status: " + (atual.ocupada ? "Ocupada" : "Livre"));
-            System.out.println("----------------------");
-            atual = atual.prox;
-        }
-    }
-}
+       
