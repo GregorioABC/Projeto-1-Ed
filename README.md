@@ -1,4 +1,4 @@
-<img src="/assets/img/Logo.jpeg">
+<img src="/assests/img/Logo.jpeg">
 # TrySys Solution
 
 Bem-vindo ao repositório oficial da TriSys Solutions, uma empresa especializada na organização de eventos e festas infantis. Nosso compromisso é criar momentos mágicos e inesquecíveis para as crianças, com segurança e conforto.
