@@ -33,7 +33,7 @@ class Medico {
     public Medico(String nome, int crm, String especialidade, boolean disponibilidade, int cpf) {
         this.nome = nome;
         this.crm = crm;
-        this.cpf = cpf; // se for pesquisar algo do evento e do restauranrte o parametro de busca vai ser o cpf 
+        this.cpf = cpf;
         this.especialidade = especialidade;
         this.disponibilidade = disponibilidade;
         this.Patendidos = 0;
@@ -43,7 +43,6 @@ class Medico {
     public void incrementaPacientesAtendidos() {
         this.Patendidos++;
     }
-
 }
 
 class Consulta {
@@ -67,10 +66,7 @@ class ListaPacientes {
         this.inicio = null;
     }
 
-    // Método para criar um novo paciente
-    public Paciente criarPaciente() {
-        Scanner scanner = new Scanner(System.in);
-
+    public Paciente criarPaciente(Scanner scanner) {
         System.out.println("Digite o nome do paciente:");
         String nome = scanner.nextLine();
 
@@ -88,21 +84,20 @@ class ListaPacientes {
         System.out.println("Última consulta do paciente (formato DD/MM/AAAA):");
         String ultConsulta = scanner.nextLine();
 
-        return new Paciente(nome, idade, hMedico, ultConsulta, cpf );
+        return new Paciente(nome, idade, hMedico, ultConsulta, cpf);
     }
 
-    // Método para inserir paciente ordenado alfabeticamente
     public boolean inserirPacienteOrdenado(Paciente novo) {
         if (inicio == null) {
-            inicio = novo;  //conferiu se tava vazia 
+            inicio = novo;
             return true;
         }
-// se n tiver vazia 
-        Paciente atual = inicio;// estabelece aux para percorrer a lista 
-        Paciente anterior = null;// ta null pq ainda n percorreu a lista 
 
-        while (atual != null && atual.nome.compareToIgnoreCase(novo.nome) < 0) {// enq o atual for antt do novo 
-            anterior = atual; // encontrar a posiçao correta p botar 
+        Paciente atual = inicio;
+        Paciente anterior = null;
+
+        while (atual != null && atual.nome.compareToIgnoreCase(novo.nome) < 0) {
+            anterior = atual;
             atual = atual.prox;
         }
 
@@ -110,13 +105,13 @@ class ListaPacientes {
             return false;
         }
 
-        if (anterior == null) { // null pq ainda n tem nada na lista 
+        if (anterior == null) {
             novo.prox = inicio;
             inicio.ant = novo;
             inicio = novo;
         } else {
             anterior.prox = novo;
-            novo.ant = anterior; // else pq tem paciente e vai ser botado ente o anterior e prox  
+            novo.ant = anterior;
             novo.prox = atual;
             if (atual != null) {
                 atual.ant = novo;
@@ -131,7 +126,7 @@ class ListaPacientes {
         while (atual != null) {
             System.out.println("Nome: " + atual.nome);
             System.out.println("Idade: " + atual.idade);
-             System.out.println("cpf " + atual.cpf);
+            System.out.println("CPF: " + atual.cpf);
             System.out.println("Histórico Médico: " + atual.hMedico);
             System.out.println("Última Consulta: " + atual.ultConsulta);
             System.out.println("----------------------");
@@ -139,50 +134,42 @@ class ListaPacientes {
         }
     }
 
-
-    // busca paciente  
-    public Paciente buscarPaciente(String nome){
+    public Paciente buscarPaciente(String nome) {
         Paciente atual = inicio;
-        while (atual != null){// enqunto a lista nao ta vazia 
-            if (atual.nome.equalsIgnoreCase(nome)){//compara se o nome do paciente na lista é igual ao q o usuario ta procurando 
+        while (atual != null) {
+            if (atual.nome.equalsIgnoreCase(nome)) {
                 return atual;
             }
-            atual = atual.prox; // o ponteiro vai andando e entra no while novamente  
+            atual = atual.prox;
         }
-        return null;//se percorrer tudo e n achar ai null 
-
-
+        return null;
     }
-    // excluir paciente
-    public boolean excluirPaciente(String nome){
 
-        Paciente atual = inicio;// definidno q vai do começo da lista 
+    public boolean excluirPaciente(String nome) {
+        Paciente atual = inicio;
         Paciente anterior = null;
 
-        while (atual != null && !atual.nome.equalsIgnoreCase(nome)){// enquanto tem no na lista e nao chegou no fim 
-            anterior = atual; 
-            atual = atual.prox; 
-        } 
-            if(atual==null){
-            return false; // pq tava vazia ou n encontrou o paciente 
-         } 
-            if(anterior == null){// tirar o primeiro paciente 
-                inicio = atual.prox; 
-                if(inicio!=null){
-                    inicio.ant=null; 
-                }
-        } else {  // tirara do final ou meio 
-                    anterior.prox = atual.prox;
-                    if (atual.prox != null) {
-                        atual.prox.ant = anterior;// CONFUSO 
-                    }
-                }
-                return true; 
+        while (atual != null && !atual.nome.equalsIgnoreCase(nome)) {
+            anterior = atual;
+            atual = atual.prox;
         }
+        if (atual == null) {
+            return false;
+        }
+        if (anterior == null) {
+            inicio = atual.prox;
+            if (inicio != null) {
+                inicio.ant = null;
+            }
+        } else {
+            anterior.prox = atual.prox;
+            if (atual.prox != null) {
+                atual.prox.ant = anterior;
+            }
+        }
+        return true;
     }
-
-
-
+}
 
 class ListaMedicos {
     private Medico inicio;
@@ -191,9 +178,7 @@ class ListaMedicos {
         this.inicio = null;
     }
 
-    public Medico criarMedico() {
-        Scanner scanner = new Scanner(System.in);
-
+    public Medico criarMedico(Scanner scanner) {
         System.out.println("Digite o nome do médico:");
         String nome = scanner.nextLine();
 
@@ -204,7 +189,7 @@ class ListaMedicos {
         System.out.println("Digite a especialidade do médico:");
         String especialidade = scanner.nextLine();
 
-        System.out.println("Digite o CPF do medico");
+        System.out.println("Digite o CPF do médico");
         int cpf = scanner.nextInt();
         scanner.nextLine();
 
@@ -254,73 +239,66 @@ class ListaMedicos {
         while (atual != null) {
             System.out.println("Nome: " + atual.nome);
             System.out.println("CRM: " + atual.crm);
-             System.out.println("cpf do medico " + atual.cpf);
+            System.out.println("CPF: " + atual.cpf);
             System.out.println("Especialidade: " + atual.especialidade);
             System.out.println("Disponibilidade: " + (atual.disponibilidade ? "Sim" : "Não"));
             System.out.println("----------------------");
             atual = atual.prox;
         }
     }
-    // busca de medico 
-    public Medico buscarMedico(int crm){
+
+    public Medico buscarMedico(int crm) {
         Medico atual = inicio;
 
-        while (atual != null){// enqunto a lista nao ta vazia 
-            if (atual.crm==crm ){//compara se o nome do paciente na lista é igual ao q o usuario ta procurando 
+        while (atual != null) {
+            if (atual.crm == crm) {
                 return atual;
             }
-            atual = atual.prox; // o ponteiro vai andando e entra no while novamente  
+            atual = atual.prox;
         }
-        return null;//se percorrer tudo e n achar ai null 
-
+        return null;
     }
 
-    // excluir medico
-    public boolean excluirMedico(int crm){
-
-        Medico atual = inicio;// definidno q vai do começo da lista 
+    public boolean excluirMedico(int crm) {
+        Medico atual = inicio;
         Medico anterior = null;
 
-        while (atual != null && atual.crm != crm) { // enquanto o crm NAO for o mesmo ele continua prpcurando
+        while (atual != null && atual.crm != crm) {
             anterior = atual;
             atual = atual.prox;
         }
-            if(atual==null){ 
-            return false; // pq tava vazia ou n encontrou o paciente 
-         } 
-            if(anterior == null){// tirar o primeiro paciente 
-                inicio = atual.prox; 
-                if(inicio!=null){
-                    inicio.ant=null; 
-                }
-        } else {  // tirara do final ou meio 
-                    anterior.prox = atual.prox;
-                    if (atual.prox != null) {
-                        atual.prox.ant = anterior;
-                    }
-                }
-                return true; 
+        if (atual == null) {
+            return false;
         }
-    //medico que tem mais atendimento 
+        if (anterior == null) {
+            inicio = atual.prox;
+            if (inicio != null) {
+                inicio.ant = null;
+            }
+        } else {
+            anterior.prox = atual.prox;
+            if (atual.prox != null) {
+                atual.prox.ant = anterior;
+            }
+        }
+        return true;
+    }
+
     public Medico medicoMaisAtendeu() {
         Medico atual = inicio;
-        Medico medicoMaisAtendeu = null; // ainda nntem nada
-        int maxPacientes = -1; // garantir q a qtd de pacientes seja maio q -1
-        while (atual != null) {                                                      //REVERRRRR 
+        Medico medicoMaisAtendeu = null;
+        int maxPacientes = -1;
+        while (atual != null) {
             if (atual.Patendidos > maxPacientes) {
                 maxPacientes = atual.Patendidos;
                 medicoMaisAtendeu = atual;
             }
             atual = atual.prox;
         }
-
         return medicoMaisAtendeu;
-
-
-
     }
 }
-                                // CONSULTA 
+
 class ListaConsultas {
     private Consulta inicio;
 
@@ -328,31 +306,27 @@ class ListaConsultas {
         this.inicio = null;
     }
 
-    public Consulta criarConsulta(ListaMedicos listaMedicos) { 
-        Scanner scanner = new Scanner(System.in);
-
+    public Consulta criarConsulta(ListaMedicos listaMedicos, Scanner scanner) {
         System.out.println("Digite o nome do paciente para a consulta:");
         String nome = scanner.nextLine();
 
         System.out.println("Digite a data da última consulta (formato DD/MM/AAAA):");
         String ultConsulta = scanner.nextLine();
 
-        System.out.println("diga o crm do medico que ira atender");
+        System.out.println("Diga o CRM do médico que irá atender:");
         int crm = scanner.nextInt();
         scanner.nextLine(); // Limpar o buffer do teclado
 
-
-          Medico medico = listaMedicos.buscarMedico(crm); // ENTENDI DIREITO NAOOOOO
+        Medico medico = listaMedicos.buscarMedico(crm);
         if (medico != null) {
             medico.incrementaPacientesAtendidos();
         } else {
             System.out.println("Médico não encontrado.");
         }
 
-
         return new Consulta(nome, ultConsulta);
     }
-//inserir consulta ordenada por data
+
     public boolean inserirConsultaOrdenada(Consulta nova) {
         if (inicio == null) {
             inicio = nova;
@@ -363,20 +337,20 @@ class ListaConsultas {
         Consulta anterior = null;
 
         while (atual != null && atual.nome.compareToIgnoreCase(nova.nome) < 0) {
-            anterior = atual;// enquanto o atual for menor que o novo os ponteiros vao andando ate achar o lugar certo
+            anterior = atual;
             atual = atual.prox;
         }
 
         if (atual != null && atual.nome.equalsIgnoreCase(nova.nome)) {
-            return false; // se o nome atual for igual ao novo n entra pq n permite repetido 
+            return false;
         }
 
-        if (anterior == null) {// inserir no inicoo da lisa 
-            nova.prox = inicio; 
+        if (anterior == null) {
+            nova.prox = inicio;
             inicio.ant = nova;
             inicio = nova;
         } else {
-            anterior.prox = nova; // inserir no meio ou final 
+            anterior.prox = nova;
             nova.ant = anterior;
             nova.prox = atual;
             if (atual != null) {
@@ -390,65 +364,22 @@ class ListaConsultas {
     public void imprimirLista() {
         Consulta atual = inicio;
         while (atual != null) {
-            System.out.println("Nome: " + atual.nome);
+            System.out.println("Nome do Paciente: " + atual.nome);
             System.out.println("Última Consulta: " + atual.ultConsulta);
-
             System.out.println("----------------------");
             atual = atual.prox;
         }
-    } 
-    // busca consulta
-    public Consulta buscarConsulta( String ultConsulta){
-        Consulta atual = inicio;
-
-        while (atual != null){// enqunto a lista nao ta vazia 
-            if (atual.ultConsulta.equalsIgnoreCase(ultConsulta) ){//compara se o nome do paciente na lista é igual ao q o usuario ta procurando 
-                return atual;
-            }
-            atual = atual.prox; // o ponteiro vai andando e entra no while novamente  
-        }
-        return null;//se percorrer tudo e n achar ai null 
-
-    } 
-     //EXCLUIR CONSULTA 
-    public boolean excluirConsulta(String ultConsulta){
-
-        Consulta atual = inicio;
-        Consulta anterior = null;
-
-        while (atual != null && !atual.ultConsulta.equalsIgnoreCase(ultConsulta)){
-            anterior = atual; 
-            atual = atual.prox; 
-        } 
-            if(atual==null){
-            return false; 
-         } 
-            if(anterior == null){
-                inicio = atual.prox; 
-                if(inicio!=null){
-                    inicio.ant=null; 
-                }
-        } else {  
-                    anterior.prox = atual.prox;
-                    if (atual.prox != null) {
-                        atual.prox.ant = anterior;  // CONFUSO 
-                    }
-                }
-                return true; 
-        }
-
+    }
 }
 
-
-public class Main {
+public class SistemaClinica {
     private static final int CODIGO = 000; // Defina o código de acesso para funcionários
 
-    public static void main(String[] args) {
-        // Inicializando
+    public static void executar(Scanner scanner) {
+        // Inicializando listas
         ListaPacientes listaPacientes = new ListaPacientes();
         ListaMedicos listaMedicos = new ListaMedicos();
         ListaConsultas listaConsultas = new ListaConsultas();
-        Scanner scanner = new Scanner(System.in);
         String opcao;
         int codigoFuncionario;
 
@@ -465,14 +396,14 @@ public class Main {
                     System.out.print(" 1 - Inserir paciente\n 2 - Marcar consulta\n 0 - Voltar ao menu principal: ");
                     opcao = scanner.nextLine();
                     if (opcao.equals("1")) {
-                        Paciente novo = listaPacientes.criarPaciente();
+                        Paciente novo = listaPacientes.criarPaciente(scanner);
                         if (listaPacientes.inserirPacienteOrdenado(novo)) {
                             System.out.println("Paciente inserido com sucesso!");
                         } else {
                             System.out.println("Erro ao inserir paciente");
                         }
                     } else if (opcao.equals("2")) {
-                        Consulta nova = listaConsultas.criarConsulta(listaMedicos);
+                        Consulta nova = listaConsultas.criarConsulta(listaMedicos, scanner);
                         if (listaConsultas.inserirConsultaOrdenada(nova)) {
                             System.out.println("Consulta inserida com sucesso!");
                         } else {
@@ -489,24 +420,24 @@ public class Main {
                 if (codigoFuncionario == CODIGO) {
                     // Opções para funcionários
                     do {
-                        System.out.print("Escolha uma opção:\n 1 - Inserir paciente\n 2 - Inserir médico\n 3 - Inserir consulta\n 4 - Exibir médico que atendeu mais pacientes\n 5-exibir lista de pacientes\n 6-exibir lista de medicos\n 0 - Voltar ao menu principal: ");
+                        System.out.print("Escolha uma opção:\n 1 - Inserir paciente\n 2 - Inserir médico\n 3 - Inserir consulta\n 4 - Exibir médico que atendeu mais pacientes\n 5 - Exibir lista de pacientes\n 6 - Exibir lista de médicos\n 0 - Voltar ao menu principal: ");
                         opcao = scanner.nextLine();
                         if (opcao.equals("1")) {
-                            Paciente novo = listaPacientes.criarPaciente();
+                            Paciente novo = listaPacientes.criarPaciente(scanner);
                             if (listaPacientes.inserirPacienteOrdenado(novo)) {
                                 System.out.println("Paciente inserido com sucesso!");
                             } else {
                                 System.out.println("Erro ao inserir paciente. Paciente já existe.");
                             }
                         } else if (opcao.equals("2")) {
-                            Medico novo = listaMedicos.criarMedico();
+                            Medico novo = listaMedicos.criarMedico(scanner);
                             if (listaMedicos.inserirMedicoOrdenado(novo)) {
                                 System.out.println("Médico inserido com sucesso!");
                             } else {
                                 System.out.println("Erro ao inserir médico. Médico já existe.");
                             }
                         } else if (opcao.equals("3")) {
-                            Consulta nova = listaConsultas.criarConsulta(listaMedicos);
+                            Consulta nova = listaConsultas.criarConsulta(listaMedicos, scanner);
                             if (listaConsultas.inserirConsultaOrdenada(nova)) {
                                 System.out.println("Consulta inserida com sucesso!");
                             } else {
@@ -523,9 +454,9 @@ public class Main {
                             } else {
                                 System.out.println("Nenhum médico encontrado.");
                             }
-                        } else if (opcao.equals("5")){
+                        } else if (opcao.equals("5")) {
                             listaPacientes.imprimirLista();
-                        } else if(opcao.equals("6")){
+                        } else if (opcao.equals("6")) {
                             listaMedicos.imprimirLista();
                         }
                     } while (!opcao.equals("0"));
@@ -533,11 +464,15 @@ public class Main {
                     System.out.println("Código de funcionário incorreto.");
                 }
             } else {
-                System.out.println("Tipo inválido. Digite 'p' para paciente ou 'f' para funcionário.");
+                System.out.println("Tipo inválido. Digite '1' para paciente ou '2' para funcionário.");
             }
         }
 
-        scanner.close();
+        scanner.close(); // Fechar o scanner ao final
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        executar(scanner);
     }
 }
-
