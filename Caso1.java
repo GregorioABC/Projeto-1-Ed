@@ -3,13 +3,13 @@ import java.util.Scanner;
 class Paciente {
     String nome;
     int idade;
-    String hMedico;=
+    String hMedico;
     int cpf; 
     String ultConsulta;
     Paciente prox; // Próximo nó
     Paciente ant; // Nó anterior
 
-    public Paciente(String nome, int idade, String hMedico, String ultConsulta) {
+    public Paciente(String nome, int idade, String hMedico, String ultConsulta, int cpf) {
         this.nome = nome;
         this.idade = idade;
         this.hMedico = hMedico;
@@ -26,18 +26,24 @@ class Medico {
     int cpf;
     String especialidade;
     boolean disponibilidade;
+    int Patendidos;
     Medico prox; // Próximo nó
     Medico ant; // Nó anterior
 
-    public Medico(String nome, int crm, String especialidade, boolean disponibilidade) {
+    public Medico(String nome, int crm, String especialidade, boolean disponibilidade, int cpf) {
         this.nome = nome;
         this.crm = crm;
         this.cpf = cpf; // se for pesquisar algo do evento e do restauranrte o parametro de busca vai ser o cpf 
         this.especialidade = especialidade;
         this.disponibilidade = disponibilidade;
+        this.Patendidos = 0;
         this.prox = null;
         this.ant = null;
     }
+    public void incrementaPacientesAtendidos() {
+        this.Patendidos++;
+    }
+
 }
 
 class Consulta {
@@ -75,10 +81,14 @@ class ListaPacientes {
         System.out.println("Histórico médico do paciente:");
         String hMedico = scanner.nextLine();
 
+        System.out.println("Digite o CPF do paciente");
+        int cpf = scanner.nextInt();
+        scanner.nextLine();
+
         System.out.println("Última consulta do paciente (formato DD/MM/AAAA):");
         String ultConsulta = scanner.nextLine();
 
-        return new Paciente(nome, idade, hMedico, ultConsulta);
+        return new Paciente(nome, idade, hMedico, ultConsulta, cpf );
     }
 
     // Método para inserir paciente ordenado alfabeticamente
@@ -121,6 +131,7 @@ class ListaPacientes {
         while (atual != null) {
             System.out.println("Nome: " + atual.nome);
             System.out.println("Idade: " + atual.idade);
+             System.out.println("cpf " + atual.cpf);
             System.out.println("Histórico Médico: " + atual.hMedico);
             System.out.println("Última Consulta: " + atual.ultConsulta);
             System.out.println("----------------------");
@@ -139,6 +150,7 @@ class ListaPacientes {
             atual = atual.prox; // o ponteiro vai andando e entra no while novamente  
         }
         return null;//se percorrer tudo e n achar ai null 
+
 
     }
     // excluir paciente
@@ -192,11 +204,15 @@ class ListaMedicos {
         System.out.println("Digite a especialidade do médico:");
         String especialidade = scanner.nextLine();
 
+        System.out.println("Digite o CPF do medico");
+        int cpf = scanner.nextInt();
+        scanner.nextLine();
+
         System.out.println("O médico está disponível? (1 para sim, 0 para não):");
         int disponibilidade = scanner.nextInt();
         boolean disponivel = disponibilidade != 0;
 
-        return new Medico(nome, crm, especialidade, disponivel);
+        return new Medico(nome, crm, especialidade, disponivel, cpf);
     }
 
     public boolean inserirMedicoOrdenado(Medico novo) {
@@ -238,6 +254,7 @@ class ListaMedicos {
         while (atual != null) {
             System.out.println("Nome: " + atual.nome);
             System.out.println("CRM: " + atual.crm);
+             System.out.println("cpf do medico " + atual.cpf);
             System.out.println("Especialidade: " + atual.especialidade);
             System.out.println("Disponibilidade: " + (atual.disponibilidade ? "Sim" : "Não"));
             System.out.println("----------------------");
@@ -284,6 +301,24 @@ class ListaMedicos {
                 }
                 return true; 
         }
+    //medico que tem mais atendimento 
+    public Medico medicoMaisAtendeu() {
+        Medico atual = inicio;
+        Medico medicoMaisAtendeu = null; // ainda nntem nada
+        int maxPacientes = -1; // garantir q a qtd de pacientes seja maio q -1
+        while (atual != null) {                                                      //REVERRRRR 
+            if (atual.Patendidos > maxPacientes) {
+                maxPacientes = atual.Patendidos;
+                medicoMaisAtendeu = atual;
+            }
+            atual = atual.prox;
+        }
+
+        return medicoMaisAtendeu;
+
+
+
+    }
 }
                                 // CONSULTA 
 class ListaConsultas {
@@ -293,7 +328,7 @@ class ListaConsultas {
         this.inicio = null;
     }
 
-    public Consulta criarConsulta() {
+    public Consulta criarConsulta(ListaMedicos listaMedicos) { 
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Digite o nome do paciente para a consulta:");
@@ -301,6 +336,18 @@ class ListaConsultas {
 
         System.out.println("Digite a data da última consulta (formato DD/MM/AAAA):");
         String ultConsulta = scanner.nextLine();
+
+        System.out.println("diga o crm do medico que ira atender");
+        int crm = scanner.nextInt();
+        scanner.nextLine(); // Limpar o buffer do teclado
+
+
+          Medico medico = listaMedicos.buscarMedico(crm); // ENTENDI DIREITO NAOOOOO
+        if (medico != null) {
+            medico.incrementaPacientesAtendidos();
+        } else {
+            System.out.println("Médico não encontrado.");
+        }
 
 
         return new Consulta(nome, ultConsulta);
@@ -345,6 +392,7 @@ class ListaConsultas {
         while (atual != null) {
             System.out.println("Nome: " + atual.nome);
             System.out.println("Última Consulta: " + atual.ultConsulta);
+
             System.out.println("----------------------");
             atual = atual.prox;
         }
@@ -391,67 +439,105 @@ class ListaConsultas {
 
 }
 
+
 public class Main {
+    private static final int CODIGO = 000; // Defina o código de acesso para funcionários
+
     public static void main(String[] args) {
-        //inicializando
+        // Inicializando
         ListaPacientes listaPacientes = new ListaPacientes();
         ListaMedicos listaMedicos = new ListaMedicos();
         ListaConsultas listaConsultas = new ListaConsultas();
         Scanner scanner = new Scanner(System.in);
         String opcao;
+        int codigoFuncionario;
 
-        // Inserir pacientes
-        do {
-            System.out.print("Deseja inserir um paciente? (s/n): ");
-            opcao = scanner.nextLine();
-            if (opcao.equalsIgnoreCase("s")) {
-                Paciente novo = listaPacientes.criarPaciente();
-                if (listaPacientes.inserirPacienteOrdenado(novo)) {
-                    System.out.println("Paciente inserido com sucesso!");
+        // Loop principal
+        while (true) {
+            System.out.print("Você é um paciente ou um funcionário? (1/2) ou 'sair' para encerrar: ");
+            String tipo = scanner.nextLine();
+
+            if (tipo.equalsIgnoreCase("sair")) {
+                break;
+            } else if (tipo.equalsIgnoreCase("1")) {
+                // Opções para pacientes
+                do {
+                    System.out.print(" 1 - Inserir paciente\n 2 - Marcar consulta\n 0 - Voltar ao menu principal: ");
+                    opcao = scanner.nextLine();
+                    if (opcao.equals("1")) {
+                        Paciente novo = listaPacientes.criarPaciente();
+                        if (listaPacientes.inserirPacienteOrdenado(novo)) {
+                            System.out.println("Paciente inserido com sucesso!");
+                        } else {
+                            System.out.println("Erro ao inserir paciente");
+                        }
+                    } else if (opcao.equals("2")) {
+                        Consulta nova = listaConsultas.criarConsulta(listaMedicos);
+                        if (listaConsultas.inserirConsultaOrdenada(nova)) {
+                            System.out.println("Consulta inserida com sucesso!");
+                        } else {
+                            System.out.println("Erro ao inserir consulta");
+                        }
+                    }
+                } while (!opcao.equals("0"));
+            } else if (tipo.equalsIgnoreCase("2")) {
+                // Verificar código do funcionário
+                System.out.print("Digite o código do funcionário: ");
+                codigoFuncionario = scanner.nextInt();
+                scanner.nextLine(); // Limpar o buffer do teclado
+
+                if (codigoFuncionario == CODIGO) {
+                    // Opções para funcionários
+                    do {
+                        System.out.print("Escolha uma opção:\n 1 - Inserir paciente\n 2 - Inserir médico\n 3 - Inserir consulta\n 4 - Exibir médico que atendeu mais pacientes\n 5-exibir lista de pacientes\n 6-exibir lista de medicos\n 0 - Voltar ao menu principal: ");
+                        opcao = scanner.nextLine();
+                        if (opcao.equals("1")) {
+                            Paciente novo = listaPacientes.criarPaciente();
+                            if (listaPacientes.inserirPacienteOrdenado(novo)) {
+                                System.out.println("Paciente inserido com sucesso!");
+                            } else {
+                                System.out.println("Erro ao inserir paciente. Paciente já existe.");
+                            }
+                        } else if (opcao.equals("2")) {
+                            Medico novo = listaMedicos.criarMedico();
+                            if (listaMedicos.inserirMedicoOrdenado(novo)) {
+                                System.out.println("Médico inserido com sucesso!");
+                            } else {
+                                System.out.println("Erro ao inserir médico. Médico já existe.");
+                            }
+                        } else if (opcao.equals("3")) {
+                            Consulta nova = listaConsultas.criarConsulta(listaMedicos);
+                            if (listaConsultas.inserirConsultaOrdenada(nova)) {
+                                System.out.println("Consulta inserida com sucesso!");
+                            } else {
+                                System.out.println("Erro ao inserir consulta. Consulta já existe.");
+                            }
+                        } else if (opcao.equals("4")) {
+                            Medico medicoTop = listaMedicos.medicoMaisAtendeu();
+                            if (medicoTop != null) {
+                                System.out.println("\nMédico que atendeu mais pacientes:");
+                                System.out.println("Nome: " + medicoTop.nome);
+                                System.out.println("CRM: " + medicoTop.crm);
+                                System.out.println("Especialidade: " + medicoTop.especialidade);
+                                System.out.println("Número de Pacientes Atendidos: " + medicoTop.Patendidos);
+                            } else {
+                                System.out.println("Nenhum médico encontrado.");
+                            }
+                        } else if (opcao.equals("5")){
+                            listaPacientes.imprimirLista();
+                        } else if(opcao.equals("6")){
+                            listaMedicos.imprimirLista();
+                        }
+                    } while (!opcao.equals("0"));
                 } else {
-                    System.out.println("Erro ao inserir paciente. Paciente já existe.");
+                    System.out.println("Código de funcionário incorreto.");
                 }
+            } else {
+                System.out.println("Tipo inválido. Digite 'p' para paciente ou 'f' para funcionário.");
             }
-        } while (opcao.equalsIgnoreCase("s"));
-
-        // Inserir médicos
-        do {
-            System.out.print("Deseja inserir um médico? (s/n): ");
-            opcao = scanner.nextLine();
-            if (opcao.equalsIgnoreCase("s")) {
-                Medico novo = listaMedicos.criarMedico();
-                if (listaMedicos.inserirMedicoOrdenado(novo)) {
-                    System.out.println("Médico inserido com sucesso!");
-                } else {
-                    System.out.println("Erro ao inserir médico. Médico já existe.");
-                }
-            }
-        } while (opcao.equalsIgnoreCase("s"));
-
-        // Inserir consultas
-        do {
-            System.out.print("Deseja inserir uma consulta? (s/n): ");
-            opcao = scanner.nextLine();
-            if (opcao.equalsIgnoreCase("s")) {
-                Consulta nova = listaConsultas.criarConsulta();
-                if (listaConsultas.inserirConsultaOrdenada(nova)) {
-                    System.out.println("Consulta inserida com sucesso!");
-                } else {
-                    System.out.println("Erro ao inserir consulta. Consulta já existe.");
-                }
-            }
-        } while (opcao.equalsIgnoreCase("s"));
-
-        // Imprimir listas
-        System.out.println("\nLista de Pacientes:");
-        listaPacientes.imprimirLista();
-
-        System.out.println("\nLista de Médicos:");
-        listaMedicos.imprimirLista();
-
-        System.out.println("\nLista de Consultas:");
-        listaConsultas.imprimirLista();
+        }
 
         scanner.close();
+    }
 }
-}
+
