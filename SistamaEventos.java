@@ -75,10 +75,10 @@ public class SistemaEventos {
                     totalParticipantes++;
                     atual = atual.proximo;
                 }
-
                 if (totalParticipantes < evento.capacidade) {
                     participante.proximo = evento.participantes;
                     evento.participantes = participante;
+                    System.out.println("Participante " + participante.nome + " adicionado ao evento " + nomeEvento + ".");
                 } else {
                     System.out.println("Capacidade máxima do evento atingida.");
                 }
@@ -86,6 +86,7 @@ public class SistemaEventos {
                 System.out.println("Evento não encontrado!");
             }
         }
+        
 
         // funções para remover
         public void removerEvento(String nomeEvento) {
@@ -203,11 +204,10 @@ public class SistemaEventos {
         }
     }
 
-    public static void executar(Scanner scanner) { // Mudança aqui
+    public static void executar(Scanner scanner) { 
         SistemaEventos sistema = new SistemaEventos();
         ListaEncadeada listaEventos = sistema.new ListaEncadeada();
         int opcao;
-
         do {
             System.out.println("\nMenu:");
             System.out.println("1. Adicionar evento no início");
@@ -223,7 +223,7 @@ public class SistemaEventos {
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Consumir a quebra de linha após o número
+            scanner.nextLine(); 
 
             switch (opcao) {
                 case 1:
