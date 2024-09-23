@@ -1,7 +1,18 @@
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class SistemaRestaurante {
     private Mesa cabeca;
+    private String[] cardapio = {"Hamburguer", "Pizza", "Salada", "Suco", "Refrigerante"}; // Cardápio pré-definido
+    private Map<String, Integer> contagemItensPedidos = new HashMap<>(); // Contador de pedidos por item
+
+    public SistemaRestaurante() {
+        // Inicializando o contador de pedidos para cada item do cardápio
+        for (String item : cardapio) {
+            contagemItensPedidos.put(item, 0);
+        }
+    }
 
     class ItemPedido {
         String descricao;
@@ -44,32 +55,70 @@ public class SistemaRestaurante {
     public void adicionarMesa(int numero, String cliente) {
         Mesa novaMesa = new Mesa(numero, cliente);
         if (cabeca == null) {
-            // Primeira mesa, aponta para ela mesma
             cabeca = novaMesa;
             cabeca.proximo = cabeca;
         } else {
-            // Insere nova mesa no final da lista circular
             Mesa atual = cabeca;
             while (atual.proximo != cabeca) {
                 atual = atual.proximo;
             }
             atual.proximo = novaMesa;
-            novaMesa.proximo = cabeca; // Mantém a circularidade
+            novaMesa.proximo = cabeca;
         }
         System.out.println("Mesa " + numero + " adicionada para o cliente " + cliente + ".");
     }
 
+    // Função para exibir o cardápio
+    public void exibirCardapio() {
+        System.out.println("Cardápio:");
+        for (String item : cardapio) {
+            System.out.println("- " + item);
+        }
+    }
+
+    // Verifica se o item está no cardápio
+    public boolean itemValido(String descricao) {
+        for (String item : cardapio) {
+            if (item.equalsIgnoreCase(descricao)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void adicionarPedido(int numeroMesa, String descricao, int quantidade, double total) {
+        if (!itemValido(descricao)) {
+            System.out.println("Item fora do cardápio: " + descricao);
+            return;
+        }
+
         Mesa mesa = buscarMesa(numeroMesa);
         if (mesa != null && mesa.status.equals("ocupada")) {
             ItemPedido novoItem = new ItemPedido(descricao, quantidade, total);
             Pedido novoPedido = new Pedido(novoItem);
             novoPedido.proximo = mesa.pedidos;
             mesa.pedidos = novoPedido;
+
+            // Atualiza a contagem do item no cardápio
+            contagemItensPedidos.put(descricao, contagemItensPedidos.get(descricao) + quantidade);
+
             System.out.println("Pedido adicionado na mesa " + numeroMesa + ".");
         } else {
             System.out.println("Mesa não encontrada ou está livre.");
         }
+    }
+
+    // Função para exibir os itens mais pedidos
+    public void exibirItensMaisPedidos() {
+        System.out.println("Itens mais pedidos:");
+        contagemItensPedidos.entrySet()
+                .stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena em ordem decrescente de pedidos
+                .forEach(entry -> {
+                    if (entry.getValue() > 0) { // Mostra apenas itens com pedidos
+                        System.out.println(entry.getKey() + ": " + entry.getValue() + " pedidos");
+                    }
+                });
     }
 
     public void fecharConta(int numeroMesa) {
@@ -83,8 +132,8 @@ public class SistemaRestaurante {
                 if (atual == mesa.pedidos) break; // Para evitar loop infinito
             }
             System.out.println("Total a pagar na mesa " + numeroMesa + ": R$ " + totalConta);
-            mesa.status = "livre"; // A mesa é liberada
-            mesa.pedidos = null; // Limpa os pedidos
+            mesa.status = "livre";
+            mesa.pedidos = null;
         } else {
             System.out.println("Mesa não encontrada ou já está livre.");
         }
@@ -99,7 +148,7 @@ public class SistemaRestaurante {
             }
             atual = atual.proximo;
         } while (atual != cabeca);
-        return null; // Se a mesa não foi encontrada
+        return null;
     }
 
     public void imprimirMesas() {
@@ -116,13 +165,13 @@ public class SistemaRestaurante {
                 do {
                     System.out.println(" - " + pedidoAtual.item.descricao + ": " + pedidoAtual.item.quantidade + " (R$ " + pedidoAtual.item.total + ")");
                     pedidoAtual = pedidoAtual.proximo;
-                } while (pedidoAtual != null && pedidoAtual != atual.pedidos); // Para evitar loop infinito
+                } while (pedidoAtual != null && pedidoAtual != atual.pedidos);
             }
             atual = atual.proximo;
         } while (atual != cabeca);
     }
 
-    public  void executar(Scanner scanner) {
+    public void executar(Scanner scanner) {
         String opcao;
 
         do {
@@ -131,6 +180,8 @@ public class SistemaRestaurante {
             System.out.println("2. Adicionar Pedido");
             System.out.println("3. Fechar Conta");
             System.out.println("4. Imprimir Mesas");
+            System.out.println("5. Exibir Cardápio");
+            System.out.println("6. Exibir Itens Mais Pedidos");
             System.out.println("0. Sair");
             System.out.print("Opção: ");
             opcao = scanner.nextLine();
@@ -139,7 +190,7 @@ public class SistemaRestaurante {
                 case "1":
                     System.out.print("Número da mesa: ");
                     int numeroMesa = scanner.nextInt();
-                    scanner.nextLine(); // Limpar o buffer do teclado
+                    scanner.nextLine();
                     System.out.print("Nome do cliente: ");
                     String cliente = scanner.nextLine();
                     adicionarMesa(numeroMesa, cliente);
@@ -147,24 +198,30 @@ public class SistemaRestaurante {
                 case "2":
                     System.out.print("Número da mesa: ");
                     numeroMesa = scanner.nextInt();
-                    scanner.nextLine(); // Limpar o buffer do teclado
+                    scanner.nextLine();
                     System.out.print("Descrição do pedido: ");
                     String descricao = scanner.nextLine();
                     System.out.print("Quantidade: ");
                     int quantidade = scanner.nextInt();
                     System.out.print("Total a pagar: ");
                     double total = scanner.nextDouble();
-                    scanner.nextLine(); // Limpar o buffer do teclado
+                    scanner.nextLine();
                     adicionarPedido(numeroMesa, descricao, quantidade, total);
                     break;
                 case "3":
                     System.out.print("Número da mesa: ");
                     numeroMesa = scanner.nextInt();
-                    scanner.nextLine(); // Limpar o buffer do teclado
+                    scanner.nextLine();
                     fecharConta(numeroMesa);
                     break;
                 case "4":
                     imprimirMesas();
+                    break;
+                case "5":
+                    exibirCardapio();
+                    break;
+                case "6":
+                    exibirItensMaisPedidos();
                     break;
                 case "0":
                     System.out.println("Saindo...");
