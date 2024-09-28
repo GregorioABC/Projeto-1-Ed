@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class SistemaRestaurante {
     private Mesa cabeca;
-    private String[] cardapio = {"Hamburguer", "Pizza", "Salada", "Suco", "Refrigerante"}; // Cardápio pré-definido
+    private String[] cardapio = {"Hamburguer", "Pizza", "Salada", "Suco", "Refrigerante", "Rosquinha"}; // Adicionando rosquinha
     private Map<String, Integer> contagemItensPedidos = new HashMap<>(); // Contador de pedidos por item
 
     public SistemaRestaurante() {
@@ -101,6 +101,11 @@ public class SistemaRestaurante {
 
             // Atualiza a contagem do item no cardápio
             contagemItensPedidos.put(descricao, contagemItensPedidos.get(descricao) + quantidade);
+
+            // Verifica a quantidade de rosquinhas pedidas
+            if (descricao.equalsIgnoreCase("rosquinha") && quantidade >= 2) {
+                System.out.println("Um pedaço de rosquinha alegra muito. Dois pedaços causam tristeza.");
+            }
 
             System.out.println("Pedido adicionado na mesa " + numeroMesa + ".");
         } else {
